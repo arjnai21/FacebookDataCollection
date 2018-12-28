@@ -1,0 +1,23 @@
+{
+"manifest_version": 2,
+
+"name": "Facebook Data Collection",
+"description": "Collects data from facebook",
+"version": "1.0",
+"content_scripts": [
+  {
+    "run_at": "document_end",
+    "matches": ["https://facebook.com/*"],
+    "js": ["main.js"]
+
+
+    }
+
+  ],
+
+"permissions": [
+"activeTab",
+"https://ajax.googleapis.com/"
+  ]
+
+}

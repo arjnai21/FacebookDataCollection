@@ -1,1 +1,1 @@
-nmj
+alert(window.location.href);
