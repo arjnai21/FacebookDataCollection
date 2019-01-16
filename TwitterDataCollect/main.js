@@ -12,7 +12,7 @@ function getNumLikes(){
     var x = document.getElementsByClassName("request-retweeted-popup");
     alert(x);
 }
-//this is an important comment ye
+//this is a change to that file
 function getNumShares(){
     var x = document.getElementsByClassName("request-favorited-popup");
     alert(x);
