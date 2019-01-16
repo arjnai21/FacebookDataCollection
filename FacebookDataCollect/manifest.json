@@ -1,22 +1,27 @@
 {
   "manifest_version": 2,
 
-  "name": "Facebook Data Collection",
-  "description": "Collect Data from Facebook",
+  "name": "Twitter Data Collection",
+  "description": "Collect Data from Twitter",
   "version": "1.0",
   "content_scripts": [
     {
       "run_at": "document_end",
-      "matches": ["https://www.facebook.com/*"],
+      "matches": ["https://twitter.com/*"],
       "js": ["main.js"]
 
 
     }
 
   ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
 
   "permissions": [
     "activeTab",
+    "tabs",
     "https://ajax.googleapis.com/"
   ]
 
