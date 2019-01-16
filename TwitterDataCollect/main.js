@@ -1,4 +1,6 @@
 alert(window.location.href);
+
+//main function
 if(window.location.href === "https://twitter.com/RudyGiuliani/status/1084428955384496128"){
     var likes = getNumLikes();
     var shares = getNumShares();
