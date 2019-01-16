@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/FacebookDataCollect.iml" filepath="$PROJECT_DIR$/.idea/FacebookDataCollect.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../TwitterDataCollect/.idea/TwitterDataCollect.iml" filepath="$PROJECT_DIR$/../TwitterDataCollect/.idea/TwitterDataCollect.iml" />
     </modules>
   </component>
 </project>
