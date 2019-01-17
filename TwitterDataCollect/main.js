@@ -6,7 +6,7 @@ if(window.location.href === "https://twitter.com/RudyGiuliani/status/10844289553
     var likes =  getNumLikes();
     var replies = getNumReplies();
     getUserRepliesList();
-
+    searchUserProfile();
 }
 
 //working
@@ -51,7 +51,12 @@ function getUserRepliesList(){
 }
 
 function searchUserProfile(user, str){
+    //text = new XMLSerializer().serializeToString(document);
+    var link = "https://twitter.com" + user.getAttribute("href");
+    var text = document.documentElement.innerHTML;
 
+    alert(text);
+    return text;
 }
 
 function iterateUsersList() {
