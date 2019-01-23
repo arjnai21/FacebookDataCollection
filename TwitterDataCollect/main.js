@@ -1,13 +1,32 @@
 //alert(window.location.href);
 
 //main function
-if(window.location.href === "https://twitter.com/RudyGiuliani/status/1084428955384496128"){
+post = "https://twitter.com/RudyGiuliani/status/1084428955384496128";
+if(window.location.href === post){ // to do if looking at a post
     var retweets = getNumRetweets();
     var likes =  getNumLikes();
     var replies = getNumReplies();
-    getUserRepliesList();
-    searchUserProfile();
+    var users = getUserRepliesList();
+    openNewTab(users[0], "skr");
 }
+
+//searchUserProfile
+
+else if(document.body.getAttribute("class").includes("ProfilePage")){
+
+    //after done, close tab, send message back with count
+    searchProfile("CNN");
+
+}
+
+function searchProfile(str){
+    var text = document.documentElement.innerHTML;
+    var count = text.split(str).length-1;
+    console.log(count);
+    setTimeout(function (){
+        window.close();},  10000);
+}
+
 
 //working
 function getNumRetweets(){
@@ -38,7 +57,7 @@ function getNumReplies() {
 function getUserRepliesList(){
     var userList = document.getElementsByClassName("account-group js-user-profile-link");
     var repliesList = [];
-    for (let i = 0; i < userList.length; i++) {
+    for (let i = 1; i < userList.length; i++) {
         if(userList[i].tagName !== "DIV"){
             repliesList.push(userList[i]);
         }
@@ -50,13 +69,23 @@ function getUserRepliesList(){
 
 }
 
-function searchUserProfile(user, str){
+function openNewTab(user){
     //text = new XMLSerializer().serializeToString(document);
     var link = "https://twitter.com" + user.getAttribute("href");
-    var text = document.documentElement.innerHTML;
+    //open new tab with that link, search entire dom with innerHTML
+    var req = {};
+    req.message = "open_new_tab";
+    req.url = link;
+    var pause = false;
+    chrome.runtime.sendMessage(req);
+    //makes code wait until message is received
+    /*while (true){
+        if (pause){
+            break;
+        }
+    }*/
+    //var text = document.documentElement.innerHTML;
 
-    alert(text);
-    return text;
 }
 
 function iterateUsersList() {
