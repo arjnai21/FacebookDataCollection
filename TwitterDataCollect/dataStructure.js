@@ -83,7 +83,7 @@ class Analysis {
 function analyze (graph) {
     let shortest = Array.from({length: graph.adj.length}, () => 0);
     shortest[0] = 0;
-
+    window.localStorage
     let acceptance = Array.from({length: graph.adj.length}, () => 0);
     acceptance[0] = 1;
 

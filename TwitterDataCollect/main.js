@@ -1,61 +1,66 @@
 //alert(window.location.href);
 
+
+/* flow -
+main
+iterate userlist
+opennewtab each user
+eac huser search profile
+save in local storage
+
+ */
 //main function
-post = "https://twitter.com/RudyGiuliani/status/1084428955384496128";
+post = "https://twitter.com/PV_Hockey_Assoc/status/1084261852324995072";
 if(window.location.href === post){ // to do if looking at a post
-    var retweets = getNumRetweets();
-    var likes =  getNumLikes();
-    var replies = getNumReplies();
-    var users = getUserRepliesList();
-    openNewTab(users[0], "skr");
+    var users = getUserRetweetsList();
+    localStorage.setItem("key", "value")
+    window.open("https://www.google.com")
+    id = 0;
+    //openNewTab(users[0]);
+}
+else if (window.location.href === "twitter.com"){
+    var d = localStorage.getItem("key")
 }
 
 //searchUserProfile
 
-else if(document.body.getAttribute("class").includes("ProfilePage")){
-
-    //after done, close tab, send message back with count
-    searchProfile("CNN");
-
+function repliesListIntoNodes(repliesList){
+    nodesList = [];
+    for (let i = 0; i < repliesList.length; i++) {
+        var newNode = {};
+        newNode.id = id++;
+        // here we get the full url for the userProfile newNode.link =
+        newNode.influenced = false; //set to false for default
+        nodesList.push(newNode);
+    }
+    return nodesList
 }
 
-function searchProfile(str){
-    var text = document.documentElement.innerHTML;
-    var count = text.split(str).length-1;
-    console.log(count);
-    setTimeout(function (){
-        window.close();},  10000);
+function mainIteration(keyword, profWindow, userNode){
+    var doc = profWindow.document;
+    var tweetsList = doc.getElementsByClassName("js-tweet-text-container");
+    for (var i = 0; i < tweetsList.length; i++){
+        if(tweetsList[i].innerHTML.includes(keyword)){
+            userNode.influenced = true;
+            var link = tweetsList[i].getElementsByClassName("TweetTextSize TweetTextSize--normal js-tweet-text tweet-text")[0].getElementsByTagName("a").getAttribute("href");
+            var postWindow = window.open(link);
+            userNode.children = repliesListIntoNodes(getUserRepliesList(postWindow));
+            for (let j = 0; j < userNode.children; j++) {
+                var theWindow = window.open(userNode.children[i].link);
+                mainIteration(keyword, theWindow, userNode.children[i])
+            }
+                //for each child open prof window and skrt
+        }
+    }
 }
+
+
 
 
 //working
-function getNumRetweets(){
-    var x = document.getElementsByClassName("request-retweeted-popup")[0];
-    var num = x.getAttribute("data-tweet-stat-count");
-
-    return num;
-}
-
-//working
-function getNumLikes(){
-    var x = document.getElementsByClassName("request-favorited-popup")[0];
-    var num = Number(x.getAttribute("data-tweet-stat-count"));
-    return num;
-}
-
-//working
-function getNumReplies() {
-
-    var x = document.getElementsByClassName("ProfileTweet-actionCount");
-    var num = Number(x[0].getAttribute("data-tweet-stat-count"));
-    return num;
-
-}
-
-
-//working
-function getUserRepliesList(){
-    var userList = document.getElementsByClassName("account-group js-user-profile-link");
+function getUserRepliesList(theWindow){
+    var doc = theWindow.document;
+    var userList = doc.getElementsByClassName("account-group js-user-profile-link");
     var repliesList = [];
     for (let i = 1; i < userList.length; i++) {
         if(userList[i].tagName !== "DIV"){
@@ -92,7 +97,7 @@ function iterateUsersList() {
     var userList = getUserRepliesList();
     var userHitDict = {};
     for (let i = 0; i < userList.length; i++) {
-        var hits = searchUserProfile(userList[i], "CNN");
+        openNewTab(userList[i]);
         userHitDict[userList[i]] = hits;
     }
 
