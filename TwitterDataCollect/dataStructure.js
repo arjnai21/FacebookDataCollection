@@ -5,8 +5,8 @@
 // It includes whether it is influenced or not and its children.
 // Note: The source is considered "influenced" even though it's not an account
 class Graph {
-    constructor() {
-        this.adj = [];
+    constructor(adj) {
+        this.adj = adj;
     }
 
     // Adds a new account to the graph given whether it's influenced or not and its children
