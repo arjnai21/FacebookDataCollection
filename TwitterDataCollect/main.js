@@ -17,7 +17,7 @@ node.children = array of children nodes
 const POST = "https://twitter.com/PV_Hockey_Assoc/status/1084261852324995072";
 const SEARCH_STR = "thank";
 var counter = 0;
-var allNodes = {};
+var allNodes = [];
 var dummyNode = {};
 dummyNode.influenced = true; //simply for conversion algorithm
 dummyNode.influenceCount = 0;
@@ -44,18 +44,18 @@ function repliesListIntoNodes(repliesList) {
     for (let i = 0; i < repliesList.length; i++) {
         let newNode = {};
         newNode.link = repliesList[i].getAttribute("href");
-        /* for (let j = 0; j < allNodes.length; j++) {
+        for (let j = 0; j < allNodes.length; j++) {
             if (allNodes[j].link === newNode.link) {
                 yes = false;
                 break;
             }
-        } */
+        }
         if (yes) {
             newNode.children = [];
             newNode.influenceCount = 0;
             newNode.influenced = false; //set to false for default
             nodesList.push(newNode);
-            allNodes[id] = newNode;
+            allNodes.push(newNode);
             id++;
         }
     }
@@ -116,7 +116,7 @@ function getLinkFromTweet(tweet) { //tweet is an <li> html object
 }
 
 //working
-function getUserRepliesList(tweetWindow) { // tweetWindow is a window objext
+function getUserRepliesList(tweetWindow) { // tweetWindow is a window object
     let doc = tweetWindow.document;
     let userList = doc.getElementsByClassName("account-group js-user-profile-link");
     let repliesList = [];
