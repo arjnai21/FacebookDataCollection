@@ -35,7 +35,7 @@ class Graph {
 // Account 2 has been influenced, so Accounts 4 and 5 react to 2.
 // Account 4 has been influenced, but no one else reacts to their posts (therefore it has no children)
 // Account 5 has not bee influenced.
-let exampleGraph = new Graph();
+let exampleGraph = new Graph([]);
 exampleGraph.addNode(true);
 exampleGraph.addNode(true);
 exampleGraph.addNode(true);
@@ -83,7 +83,6 @@ class Analysis {
 function analyze (graph) {
     let shortest = Array.from({length: graph.adj.length}, () => 0);
     shortest[0] = 0;
-    window.localStorage
     let acceptance = Array.from({length: graph.adj.length}, () => 0);
     acceptance[0] = 1;
 
@@ -161,3 +160,49 @@ function analyze (graph) {
 
 let exampleAnalysis = analyze(exampleGraph);
 exampleAnalysis.printAnalysis();
+
+
+
+let converted = new Graph([]);
+function convertTree (parentID, currentNode) {
+    let currentID = converted.adj.length;
+    currentNode.id = currentID;
+    let influenced = currentNode.influenced;
+    converted.addNode(influenced);
+    if (converted.adj.length > 1) {
+        console.log(parentID + " " + currentID);
+        converted.addEdge(parentID, currentID);
+    }
+
+    if (influenced) {
+        for (let i = 0; i < currentNode.children.length; i++) {
+            if (currentNode.children[i].id < currentID) {
+                converted.addEdge(currentID, currentNode.children[i].id);
+                continue;
+            }
+            convertTree(currentID, currentNode.children[i]);
+        }
+    }
+}
+
+let node0 = {influenced: true, children: []};
+let node1 = {influenced: true, children: []};
+let node2 = {influenced: true, children: []};
+let node3 = {influenced: false, children: []};
+let node4 = {influenced: true, children: []};
+let node5 = {influenced: false, children: []};
+let node6 = {influenced: true, children: []};
+let node7 = {influenced: false, children: []};
+
+node4.children.push(node7);
+node2.children.push(node4);
+node2.children.push(node5);
+node1.children.push(node3);
+node1.children.push(node4);
+node6.children.push(node2);
+node0.children.push(node1);
+node0.children.push(node2);
+node0.children.push(node6);
+
+convertTree(0, node0);
+converted.printGraph();
