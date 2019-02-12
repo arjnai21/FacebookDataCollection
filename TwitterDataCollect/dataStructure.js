@@ -10,11 +10,12 @@ class Graph {
     }
 
     // Adds a new account to the graph given whether it's influenced or not and its children
-    addNode(influenced) {
+    addNode(influenced, link) {
         let id = this.adj.length;
         this.adj.push({});
 
         this.adj[id].influenced = influenced;
+        this.adj[id].link = link;
         this.adj[id].children = [];
     }
 
@@ -25,39 +26,10 @@ class Graph {
 
     printGraph() {
         for (let i = 0; i < this.adj.length; i++) {
-            console.log(i + ": " + this.adj[i].influenced + "; -> " + this.adj[i].children);
+            console.log(i + ": " + this.adj[i].influenced + " " + this.adj[i].link + "; -> " + this.adj[i].children);
         }
     }
 }
-
-// In this example, the source reaches Accounts 1 and 2
-// Account 1 has been influenced, so Account 3 reacts to 1. However, Account 3 hasn't been influenced.
-// Account 2 has been influenced, so Accounts 4 and 5 react to 2.
-// Account 4 has been influenced, but no one else reacts to their posts (therefore it has no children)
-// Account 5 has not bee influenced.
-let exampleGraph = new Graph([]);
-exampleGraph.addNode(true);
-exampleGraph.addNode(true);
-exampleGraph.addNode(true);
-exampleGraph.addNode(false);
-exampleGraph.addNode(true);
-exampleGraph.addNode(false);
-
-exampleGraph.addNode(true);
-exampleGraph.addNode(false);
-
-exampleGraph.addEdge(0, 1);
-exampleGraph.addEdge(0, 2);
-exampleGraph.addEdge(1, 3);
-exampleGraph.addEdge(2, 4);
-exampleGraph.addEdge(2, 5);
-exampleGraph.addEdge(0, 6);
-
-exampleGraph.addEdge(6, 2);
-exampleGraph.addEdge(1, 4);
-exampleGraph.addEdge(4, 7);
-
-exampleGraph.printGraph();
 
 class Analysis {
     constructor(sp, ar, sr, level) {
@@ -158,19 +130,16 @@ function analyze (graph) {
     return new Analysis(shortest, acceptance, spread, level);
 }
 
-let exampleAnalysis = analyze(exampleGraph);
-exampleAnalysis.printAnalysis();
-
-
+// let exampleAnalysis = analyze(exampleGraph);
+// exampleAnalysis.printAnalysis();
 
 let converted = new Graph([]);
 function convertTree (parentID, currentNode) {
     let currentID = converted.adj.length;
     currentNode.id = currentID;
     let influenced = currentNode.influenced;
-    converted.addNode(influenced);
+    converted.addNode(influenced, currentNode.link);
     if (converted.adj.length > 1) {
-        console.log(parentID + " " + currentID);
         converted.addEdge(parentID, currentID);
     }
 
@@ -185,24 +154,10 @@ function convertTree (parentID, currentNode) {
     }
 }
 
-let node0 = {influenced: true, children: []};
-let node1 = {influenced: true, children: []};
-let node2 = {influenced: true, children: []};
-let node3 = {influenced: false, children: []};
-let node4 = {influenced: true, children: []};
-let node5 = {influenced: false, children: []};
-let node6 = {influenced: true, children: []};
-let node7 = {influenced: false, children: []};
-
-node4.children.push(node7);
-node2.children.push(node4);
-node2.children.push(node5);
-node1.children.push(node3);
-node1.children.push(node4);
-node6.children.push(node2);
-node0.children.push(node1);
-node0.children.push(node2);
-node0.children.push(node6);
-
-convertTree(0, node0);
+let jsonTree = '{"influenced":true,"influenceCount":0,"children":[{"link":"/ssteachero","children":[{"link":"/MissRudolphPPHS","children":[{"link":"/NFHSCounselors","children":[],"influenceCount":0,"influenced":false}],"influenceCount":4,"influenced":true}],"influenceCount":3,"influenced":true},{"link":"/tinafinster","children":[],"influenceCount":0,"influenced":false},{"link":"/tinafinster","children":[],"influenceCount":0,"influenced":false}]}';
+let tree = JSON.parse(jsonTree);
+convertTree(0, tree);
 converted.printGraph();
+
+let analyzedData = analyze(converted);
+analyzedData.printAnalysis();
