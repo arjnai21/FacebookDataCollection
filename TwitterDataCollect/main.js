@@ -18,15 +18,20 @@ const POST = "https://twitter.com/PV_Hockey_Assoc/status/1084261852324995072";
 const SEARCH_STR = "thank";
 var counter = 0;
 var allNodes = {};
+var dummyNode = {};
+dummyNode.influenced = true; //simply for conversion algorithm
+dummyNode.influenceCount = 0;
+
 if (window.location.href === POST) { // to do if looking at the post
     retweetsList = getUserRepliesList(window);
     id = 0;
-    replierNodes = repliesListIntoNodes(getUserRepliesList(window));
-    for (let i = 0; i < replierNodes.length; i++) {
-        let profWindow = window.open(replierNodes[i].link);
-        // profWindow.location.href = replierNodes[i].link;
+    dummyNode.children = repliesListIntoNodes(getUserRepliesList(window));
+    for (let i = 0; i < dummyNode.children.length; i++) {
+        let profWindow = window.open(dummyNode.children[i].link);
+        // profWindow.location.href = dummyNode.children[i].link;
         profWindow.onload = function () {
-            mainIteration(SEARCH_STR, profWindow, replierNodes[i])
+            mainIteration(SEARCH_STR, profWindow, dummyNode.children[i])
+
         }
     }
     var x = 0;
@@ -90,7 +95,7 @@ function mainIteration(keyword, profWindow, userNode) { //keyword: string profWi
                     let childProfWindow = window.open(userNode.children[j].link);
                     childProfWindow.onload = function () {
                         mainIteration(keyword, childProfWindow, userNode.children[j]);
-                        console.log(allNodes);
+                        //console.log(allNodes);
                     };
                 }
                 postWindow.close();
@@ -100,6 +105,9 @@ function mainIteration(keyword, profWindow, userNode) { //keyword: string profWi
 
 
     profWindow.close();
+    if(window.location.href === POST){
+        console.log(JSON.stringify(dummyNode));
+    }
 }
 
 function getLinkFromTweet(tweet) { //tweet is an <li> html object

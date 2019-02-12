@@ -1,0 +1,12 @@
+KEEP IN MIND:
+top node is just a dummy Node. it is set to influenced = true and influenced count = 0. make sure that isnt included
+
+
+the below string is from a test post I was working on
+
+Link: https://twitter.com/PV_Hockey_Assoc/status/1084261852324995072
+Keyword: "thank"
+
+JSON.stringified dummyNode below
+
+{"influenced":true,"influenceCount":0,"children":[{"link":"/ssteachero","children":[{"link":"/MissRudolphPPHS","children":[{"link":"/NFHSCounselors","children":[],"influenceCount":0,"influenced":false}],"influenceCount":4,"influenced":true}],"influenceCount":3,"influenced":true},{"link":"/tinafinster","children":[],"influenceCount":0,"influenced":false},{"link":"/tinafinster","children":[],"influenceCount":0,"influenced":false}]}
