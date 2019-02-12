@@ -32,21 +32,22 @@ class Graph {
 }
 
 class Analysis {
-    constructor(sp, ar, sr, level) {
-        // Shortest path to node
-        this.sp = sp;
-        // Acceptance rate for a node
-        this.ar = ar;
-        // Spread rate for a node
-        this.sr = sr;
-        // Nodes in a level - Source: Level = 0
+    constructor(shortestPath, acceptanceRate, spreadRate, level) {
+        // Shortest path to a node
+        this.shortestPath = shortestPath;
+        // The ratio of (1 if influenced, 0 if not) / number of parents
+        // This ratio only matters if the graph is not a tree
+        this.acceptanceRate = acceptanceRate;
+        // The percentage of influenced children
+        this.spreadRate = spreadRate;
+        // Number of nodes in a level (Source is level 0)
         this.level = level;
     }
 
     printAnalysis() {
-        console.log("SP: " + this.sp);
-        console.log("AR: " + this.ar);
-        console.log("SR: " + this.sr);
+        console.log("Shortest Path: " + this.shortestPath);
+        console.log("Acceptance Rate: " + this.acceptanceRate);
+        console.log("Spread Rate: " + this.spreadRate);
         console.log("Level: " + this.level);
     }
 }
@@ -83,10 +84,10 @@ function analyze (graph) {
                 shortest[graph.adj[current].children[i]] = shortest[current] + 1;
             }
 
-            // Increase parent count of child (ar)
+            // Increase parent count of child (acceptanceRate)
             parents[graph.adj[current].children[i]].push(current);
 
-            // (sr)
+            // (spreadRate)
             if (graph.adj[graph.adj[current].children[i]].influenced) {
                 numberInfluenced++;
             }
