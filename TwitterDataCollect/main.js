@@ -7,7 +7,8 @@ open influenced tweets and get repliers and search their profile
 /*
 Node Object:
 node.link = link to profile
-node.influence = is the user considered "influenced
+node.influence = is the user considered "influenced"
+node.influenceCount = number of times keyword is found
 node.children = array of children nodes
  */
 
@@ -38,13 +39,15 @@ function repliesListIntoNodes(repliesList) {
     for (let i = 0; i < repliesList.length; i++) {
         let newNode = {};
         newNode.link = repliesList[i].getAttribute("href");
-       /* for (let j = 0; j < allNodes.length; j++) {
+        /* for (let j = 0; j < allNodes.length; j++) {
             if (allNodes[j].link === newNode.link) {
                 yes = false;
                 break;
             }
-        }*/
+        } */
         if (yes) {
+            newNode.children = [];
+            newNode.influenceCount = 0;
             newNode.influenced = false; //set to false for default
             nodesList.push(newNode);
             allNodes[id] = newNode;
@@ -65,7 +68,9 @@ function mainIteration(keyword, profWindow, userNode) { //keyword: string profWi
     for (let i = 0; i < tweetsList.length; i++) {
         let tweetText = tweetsList[i].getElementsByClassName("TweetTextSize TweetTextSize--normal js-tweet-text tweet-text")[0].innerText;
         if (tweetText.toLowerCase().includes(keyword.toLowerCase())) {
+            console.log(userNode);
             userNode.influenced = true;
+            userNode.influenceCount++;
             let link = getLinkFromTweet(tweetsList[i]); //get link with tweetlist[i]
 
             /*for (let i = 0; i < links.length; i++) {
@@ -78,12 +83,14 @@ function mainIteration(keyword, profWindow, userNode) { //keyword: string profWi
 
             let postWindow = window.open(link);
             postWindow.onload = function () {
-                userNode.children = repliesListIntoNodes(getUserRepliesList(postWindow));
+                let replierList = repliesListIntoNodes(getUserRepliesList(postWindow));
+                userNode.children = userNode.children.concat(replierList);
 
                 for (let j = 0; j < userNode.children.length; j++) {
                     let childProfWindow = window.open(userNode.children[j].link);
                     childProfWindow.onload = function () {
-                        mainIteration(keyword, childProfWindow, userNode.children[j])
+                        mainIteration(keyword, childProfWindow, userNode.children[j]);
+                        console.log(allNodes);
                     };
                 }
                 postWindow.close();
