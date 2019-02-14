@@ -14,8 +14,8 @@ node.children = array of children nodes
 
 
 //main function
-const POST = "https://twitter.com/Oregonian/status/1095074408891338754";
-const SEARCH_STRS = ["blackface", "racist", "mary", "poppins"];
+const POST = "https://twitter.com/WEEI/status/1095398633183170560";
+const SEARCH_STRS = ["tom", "brady", "witchcraft", "wife"];
 var counter = 0;
 var allNodes = [];
 var dummyNode = {};
