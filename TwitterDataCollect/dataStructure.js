@@ -155,7 +155,7 @@ function convertTree (parentID, currentNode) {
     }
 }
 
-let jsonTree = '{"influenced":true,"influenceCount":0,"children":[{"link":"/ssteachero","children":[{"link":"/MissRudolphPPHS","children":[{"link":"/NFHSCounselors","children":[],"influenceCount":0,"influenced":false}],"influenceCount":4,"influenced":true}],"influenceCount":3,"influenced":true},{"link":"/tinafinster","children":[],"influenceCount":0,"influenced":false},{"link":"/tinafinster","children":[],"influenceCount":0,"influenced":false}]}';
+let jsonTree = '{"influenced":true,"influenceCount":0,"children":[{"link":"/ssteachero","children":[{"link":"/MissRudolphPPHS","children":[{"link":"/NFHSCounselors","children":[],"influenceCount":0,"influenced":false}],"influenceCount":4,"influenced":true}],"influenceCount":3,"influenced":true},{"link":"/tinafinster","children":[],"influenceCount":0,"influenced":false}]}';
 let tree = JSON.parse(jsonTree);
 convertTree(0, tree);
 converted.printGraph();

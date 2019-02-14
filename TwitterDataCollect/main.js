@@ -14,8 +14,8 @@ node.children = array of children nodes
 
 
 //main function
-const POST = "https://twitter.com/PV_Hockey_Assoc/status/1084261852324995072";
-const SEARCH_STR = "thank";
+const POST = "https://twitter.com/Oregonian/status/1095074408891338754";
+const SEARCH_STRS = ["blackface", "racist", "mary", "poppins"];
 var counter = 0;
 var allNodes = [];
 var dummyNode = {};
@@ -23,29 +23,48 @@ dummyNode.influenced = true; //simply for conversion algorithm
 dummyNode.influenceCount = 0;
 
 if (window.location.href === POST) { // to do if looking at the post
-    retweetsList = getUserRepliesList(window);
-    id = 0;
-    dummyNode.children = repliesListIntoNodes(getUserRepliesList(window));
-    for (let i = 0; i < dummyNode.children.length; i++) {
-        let profWindow = window.open(dummyNode.children[i].link);
-        // profWindow.location.href = dummyNode.children[i].link;
-        profWindow.onload = function () {
-            mainIteration(SEARCH_STR, profWindow, dummyNode.children[i])
+    let showMoreButton = document.getElementsByClassName("ThreadedConversation-showMoreThreadsButton u-textUserColor");
+    if (showMoreButton.length > 0) {
+        showMoreButton[0].click();
 
-        }
+
+        setTimeout(function () {
+            let repliesList = getUserRepliesList(window);
+            dummyNode.children = repliesListIntoNodes(repliesList, window);
+            for (let i = 0; i < dummyNode.children.length; i++) {
+                let profWindow = window.open(dummyNode.children[i].link);
+                // profWindow.location.href = dummyNode.children[i].link;
+                profWindow.onload = function () {
+                    mainIteration(SEARCH_STRS, profWindow, dummyNode.children[i])
+
+                }
+            }
+        }, 5000);
     }
-    var x = 0;
+    else {
+        let retweetsList = getUserRepliesList(window);
+        dummyNode.children = repliesListIntoNodes(retweetsList, window);
+        for (let i = 0; i < dummyNode.children.length; i++) {
+            let profWindow = window.open(dummyNode.children[i].link);
+            // profWindow.location.href = dummyNode.children[i].link;
+            profWindow.onload = function () {
+                mainIteration(SEARCH_STRS, profWindow, dummyNode.children[i])
+
+            }
+        }
+        var x = 0;
+    }
 }
 
 
-function repliesListIntoNodes(repliesList) {
+function repliesListIntoNodes(repliesList, postWindow) {
     let nodesList = [];
     let yes = true;
     for (let i = 0; i < repliesList.length; i++) {
         let newNode = {};
         newNode.link = repliesList[i].getAttribute("href");
         for (let j = 0; j < allNodes.length; j++) {
-            if (allNodes[j].link === newNode.link) {
+            if (allNodes[j].link === newNode.link || postWindow.location.href.includes(newNode.link)) {
                 yes = false;
                 break;
             }
@@ -56,13 +75,21 @@ function repliesListIntoNodes(repliesList) {
             newNode.influenced = false; //set to false for default
             nodesList.push(newNode);
             allNodes.push(newNode);
-            id++;
         }
     }
     return nodesList
 }
 
-function mainIteration(keyword, profWindow, userNode) { //keyword: string profWindow: window object userNode: Node object
+function checkForKeyWord(keywords, tweetText) { //returns boolean if any term is found
+    for (let i = 0; i < keywords.length; i++) {
+        if(tweetText.toLowerCase().includes(keywords[i].toLowerCase()))
+            return true;
+    }
+    return false;
+
+}
+
+function mainIteration(keywords, profWindow, userNode) { //keyword: string profWindow: window object userNode: Node object
 
     counter++;
     // if(counter>=5) return;
@@ -72,8 +99,8 @@ function mainIteration(keyword, profWindow, userNode) { //keyword: string profWi
 
     for (let i = 0; i < tweetsList.length; i++) {
         let tweetText = tweetsList[i].getElementsByClassName("TweetTextSize TweetTextSize--normal js-tweet-text tweet-text")[0].innerText;
-        if (tweetText.toLowerCase().includes(keyword.toLowerCase())) {
-            console.log(userNode);
+        if (checkForKeyWord(keywords, tweetText)) {
+            //console.log(userNode);
             userNode.influenced = true;
             userNode.influenceCount++;
             let link = getLinkFromTweet(tweetsList[i]); //get link with tweetlist[i]
@@ -87,25 +114,48 @@ function mainIteration(keyword, profWindow, userNode) { //keyword: string profWi
 
 
             let postWindow = window.open(link);
-            postWindow.onload = function () {
-                let replierList = repliesListIntoNodes(getUserRepliesList(postWindow));
-                userNode.children = userNode.children.concat(replierList);
 
-                for (let j = 0; j < userNode.children.length; j++) {
-                    let childProfWindow = window.open(userNode.children[j].link);
-                    childProfWindow.onload = function () {
-                        mainIteration(keyword, childProfWindow, userNode.children[j]);
-                        //console.log(allNodes);
-                    };
+            postWindow.onload = function () {
+                let showMoreButton = postWindow.document.getElementsByClassName("ThreadedConversation-showMoreThreadsButton u-textUserColor");
+                if (showMoreButton.length > 0) {
+                    showMoreButton.click();
+                    let replierList = repliesListIntoNodes(getUserRepliesList(postWindow), postWindow);
+                    let prevLength = userNode.children.length;
+                    userNode.children = userNode.children.concat(replierList);
+
+                    for (let j = 0; j < replierList.length; j++) {
+                        let childProfWindow = window.open(replierList[j].link);
+                        childProfWindow.onload = function () {
+                            mainIteration(keyword, childProfWindow, userNode.children[j + prevLength]);
+                            //console.log(allNodes);
+                        };
+                    }
+                    postWindow.close();
                 }
-                postWindow.close();
+                else {
+                    let replierList = repliesListIntoNodes(getUserRepliesList(postWindow), postWindow);
+                    let prevLength = userNode.children.length;
+                    userNode.children = userNode.children.concat(replierList);
+
+                    for (let j = 0; j < replierList.length; j++) {
+                        let childProfWindow = window.open(replierList[j].link);
+                        childProfWindow.onload = function () {
+                            mainIteration(keyword, childProfWindow, userNode.children[j + prevLength]);
+                            //console.log(allNodes);
+                        };
+                    }
+                    postWindow.close();
+                }
+
             }
+
         }
     }
 
 
     profWindow.close();
-    if(window.location.href === POST){
+    if (window.location.href === POST) {
+        console.log(dummyNode);
         console.log(JSON.stringify(dummyNode));
     }
 }
@@ -119,6 +169,7 @@ function getLinkFromTweet(tweet) { //tweet is an <li> html object
 function getUserRepliesList(tweetWindow) { // tweetWindow is a window object
     let doc = tweetWindow.document;
     let userList = doc.getElementsByClassName("account-group js-user-profile-link");
+    //account-group js-account-group js-action-profile js-user-profile-link js-nav
     let repliesList = [];
 
     for (let i = 1; i < userList.length; i++) {
@@ -156,9 +207,6 @@ function iterateUsersList() {
         openNewTab(userList[i]);
         userHitDict[userList[i]] = hits;
     }
-
     return userHitDict;
-
 }
-
 */
