@@ -12,10 +12,9 @@ node.influenceCount = number of times keyword is found
 node.children = array of child nodes
  */
 
-
 //main function
-const POST = "https://twitter.com/ava/status/1094323068195860480";
-const SEARCH_STRS = ["scientist", "researcher", "HPV"];
+const POST = "https://twitter.com/Suntimes/status/1092789944018452486";
+const SEARCH_STRS = ["blackface", "racist", "mary poppins", "blacking up"];
 
 var allNodes = [];
 var dummyNode = {};
@@ -29,22 +28,28 @@ if (window.location.href === POST) { // to do if looking at the post
 
 
     setTimeout(function () {
-        let repliesList = getUserRepliesList(window);
-        dummyNode.children = repliesListIntoNodes(repliesList, window);
+        let repliesList = getUserRepliesList(window.document);
+        dummyNode.children = repliesListIntoNodes(repliesList, window.document);
         for (let i = 0; i < dummyNode.children.length; i++) {
             let profWindow = window.open(dummyNode.children[i].link);
             // profWindow.location.href = dummyNode.children[i].link;
-            profWindow.onload = function () {
-                mainIteration(SEARCH_STRS, profWindow, dummyNode.children[i])
+            profWindow.document.body.onload = function () {
+                setTimeout(function () {
+
+
+                    let doc = profWindow.document;
+                    profWindow.close();
+                    mainIteration(doc, dummyNode.children[i])
+                }, 100);
 
             }
         }
-    }, 1000);
+    }, 2000);
 
 }
 
 
-function repliesListIntoNodes(repliesList, postWindow) {
+function repliesListIntoNodes(repliesList, doc) {
     let nodesList = [];
     let yes = true;
     let val;
@@ -55,7 +60,7 @@ function repliesListIntoNodes(repliesList, postWindow) {
         let newNode = {};
         newNode.link = repliesList[i].getAttribute("href");
         for (let j = 0; j < allNodes.length; j++) {
-            if (allNodes[j].link === newNode.link || postWindow.location.href.includes(newNode.link)) {
+            if (allNodes[j].link === newNode.link || doc.URL.includes(newNode.link)) {
                 yes = false;
                 break;
             }
@@ -71,25 +76,28 @@ function repliesListIntoNodes(repliesList, postWindow) {
     return nodesList
 }
 
-function checkForKeyWord(keywords, tweetText) { //returns boolean if any term is found
+function checkForKeyWord(keywords, text) { //returns boolean if any term is found
     for (let i = 0; i < keywords.length; i++) {
-        if (tweetText.toLowerCase().includes(keywords[i].toLowerCase()))
+        if (text.toLowerCase().includes(keywords[i].toLowerCase()))
             return true;
     }
     return false;
 
 }
 
-function mainIteration(keywords, profWindow, userNode) { //keyword: string profWindow: window object userNode: Node object
+function mainIteration(doc, userNode) { //keyword: string profWindow: window object userNode: Node object
 
     // if(counter>=5) return;
-    let doc = profWindow.document;
+    if (!checkForKeyWord(SEARCH_STRS, doc.documentElement.innerHTML)) {
+
+        return;
+    }
+
     let tweetsList = doc.getElementsByClassName("js-stream-item stream-item stream-item");
-    let link;
 
     for (let i = 0; i < tweetsList.length; i++) {
         let tweetText = tweetsList[i].getElementsByClassName("TweetTextSize TweetTextSize--normal js-tweet-text tweet-text")[0].innerText;
-        if (checkForKeyWord(keywords, tweetText)) {
+        if (checkForKeyWord(SEARCH_STRS, tweetText)) {
             //console.log(userNode);
             setTimeout(ifKeywordFound(userNode, tweetsList, i), 1000);
 
@@ -99,11 +107,10 @@ function mainIteration(keywords, profWindow, userNode) { //keyword: string profW
     }
 
 
-    profWindow.close();
-    if (window.location.href === POST) {
-        console.log(dummyNode);
-        console.log(JSON.stringify(dummyNode));
-    }
+    //   profWindow.close();
+
+        localStorage.setItem("graph", JSON.stringify(dummyNode));
+
 }
 
 function getLinkFromTweet(tweet) { //tweet is an <li> html object
@@ -112,8 +119,7 @@ function getLinkFromTweet(tweet) { //tweet is an <li> html object
 }
 
 //working
-function getUserRepliesList(tweetWindow) { // tweetWindow is a window object
-    let doc = tweetWindow.document;
+function getUserRepliesList(doc) { // tweetWindow is a window object
     let userList = doc.getElementsByClassName("account-group js-user-profile-link");
     //account-group js-account-group js-action-profile js-user-profile-link js-nav
     let repliesList = [];
@@ -147,25 +153,31 @@ function ifKeywordFound(userNode, tweetsList, i) {
 
     let postWindow = window.open(link);
 
-    postWindow.onload = function () {
-        let showMoreButton = postWindow.document.getElementsByClassName("ThreadedConversation-showMoreThreadsButton u-textUserColor");
-        if (showMoreButton.length > 0)
-            showMoreButton[0].click();
+    postWindow.document.body.onload = function () {
         setTimeout(function () {
-            let replierList = repliesListIntoNodes(getUserRepliesList(postWindow), postWindow);
-            let prevLength = userNode.children.length;
-            userNode.children = userNode.children.concat(replierList);
+            let showMoreButton = postWindow.document.getElementsByClassName("ThreadedConversation-showMoreThreadsButton u-textUserColor");
+            if (showMoreButton.length > 0)
+                showMoreButton[0].click();
+            setTimeout(function () {
+                let doc = postWindow.document;
+                postWindow.close();
+                let replierList = repliesListIntoNodes(getUserRepliesList(doc), doc);
 
-            for (let j = prevLength; j < replierList.length + prevLength; j++) {
-                let childProfWindow = window.open(replierList[j].link);
-                childProfWindow.onload = function () {
-                    mainIteration(SEARCH_STRS, childProfWindow, userNode.children[j]);
-                    //console.log(allNodes);
-                };
+                let prevLength = userNode.children.length;
+                userNode.children = userNode.children.concat(replierList);
 
-            }
-            postWindow.close();
-        }, 1000);
+                for (let j = prevLength; j < userNode.children.length; j++) {
+                    let childProfWindow = window.open(userNode.children[j].link);
+                    childProfWindow.document.body.onload = function () {
+                        let doc = childProfWindow.document;
+                        childProfWindow.close();
+                        mainIteration(doc, userNode.children[j]);
+                        //console.log(allNodes);
+                    };
+
+                }
+            }, 2000);
+        }, 100);
     };
 }
 
