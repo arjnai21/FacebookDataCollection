@@ -13,8 +13,8 @@ node.children = array of child nodes
  */
 
 //main function
-const POST = "https://twitter.com/ava/status/1094323068195860480";
-const SEARCH_STRS = ["scientist", "researcher", "HPV", "malignant", "neoplasm"," patient ", "Gallegos", "photodynamic", "therapy"];
+const POST = "post: https://twitter.com/Gospel_Truther/status/1094738055733350401";
+const SEARCH_STRS = ["Tom Brady", "witch"];
 
 var allNodes = [];
 var dummyNode = {};
