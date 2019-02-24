@@ -32,7 +32,7 @@ class Graph {
 }
 
 class Analysis {
-    constructor(shortestPath, acceptanceRate, spreadRate, level) {
+    constructor(shortestPath, acceptanceRate, spreadRate, level, levelSpreadCapability, netProductivity) {
         // Shortest path to a node
         this.shortestPath = shortestPath;
         // The ratio of (1 if influenced, 0 if not) / number of parents
@@ -42,6 +42,10 @@ class Analysis {
         this.spreadRate = spreadRate;
         // Number of nodes in a level (Source is level 0)
         this.level = level;
+        // Percentage of influenced nodes at a level
+        this.levelSpreadCapability = levelSpreadCapability;
+        // Percentage of all nodes that are influenced in whole graph
+        this.netProductivity = netProductivity;
     }
 
     printAnalysis() {
@@ -49,6 +53,8 @@ class Analysis {
         console.log("Acceptance Rate: " + this.acceptanceRate);
         console.log("Spread Rate: " + this.spreadRate);
         console.log("Level: " + this.level);
+        console.log("Level Spread Capability: " + this.levelSpreadCapability);
+        console.log("Net Productivity: " + this.netProductivity);
     }
 }
 
@@ -64,6 +70,8 @@ function analyze (graph) {
 
     let spread = Array.from({length: graph.adj.length}, () => 0);
 
+    let influencedInLevel = [];
+
     // Begin BFS
     let visited = Array.from({length: graph.adj.length}, () => false);
     let queue = [];
@@ -72,6 +80,15 @@ function analyze (graph) {
 
     while(queue.length !== 0) {
         let current = queue.pop();
+
+        if (graph.adj[current].influenced) {
+            // If we come across a new level, begin another count in the array
+            if (influencedInLevel.length === shortest[current]) {
+                influencedInLevel.push(1);
+            } else {
+                influencedInLevel[shortest[current]]++;
+            }
+        }
 
         // Calculate number influenced to determine spread rate
         let numberInfluenced = 0;
@@ -128,7 +145,14 @@ function analyze (graph) {
         level[shortest[i]]++;
     }
 
-    return new Analysis(shortest, acceptance, spread, level);
+    let netProductivity = influencedInLevel.reduce((sum, x) => sum + x) / level.reduce((sum, x) => sum + x);
+
+    let spreadCapability = [];
+    for (let i = 0; i < level.length; i++) {
+        spreadCapability[i] = influencedInLevel[i] / level[i];
+    }
+
+    return new Analysis(shortest, acceptance, spread, level, spreadCapability, netProductivity);
 }
 
 // let exampleAnalysis = analyze(exampleGraph);
@@ -155,7 +179,7 @@ function convertTree (parentID, currentNode) {
     }
 }
 
-let jsonTree = '{"influenced":true,"influenceCount":0,"children":[{"link":"/TimothyAMcNeil","children":[],"influenceCount":0,"influenced":false},{"link":"/SenatorCruz_","children":[],"influenceCount":0,"influenced":false},{"link":"/ModernCortes","children":[],"influenceCount":0,"influenced":false},{"link":"/thefotowarrior","children":[],"influenceCount":0,"influenced":false},{"link":"/SusanTh98642940","children":[],"influenceCount":0,"influenced":false},{"link":"/GoCoffeeEnergy","children":[],"influenceCount":0,"influenced":false},{"link":"/outlawbooster","children":[],"influenceCount":0,"influenced":false},{"link":"/pdowns19751","children":[],"influenceCount":0,"influenced":false},{"link":"/Bobolinks11","children":[],"influenceCount":0,"influenced":false},{"link":"/BoxingOver","children":[],"influenceCount":0,"influenced":false},{"link":"/VincentBayer6","children":[],"influenceCount":0,"influenced":false},{"link":"/lavindir75","children":[],"influenceCount":0,"influenced":false},{"link":"/cptcookswife","children":[{"link":"/ConradFisher","children":[],"influenceCount":0,"influenced":false},{"link":"/alefbuys","children":[],"influenceCount":0,"influenced":false},{"link":"/edguyplace","children":[],"influenceCount":0,"influenced":false},{"link":"/UriBlago","children":[],"influenceCount":1,"influenced":true},{"link":"/MildlyJoel","children":[],"influenceCount":0,"influenced":false},{"link":"/prebendarcik","children":[],"influenceCount":0,"influenced":false},{"link":"/jackstovall57","children":[],"influenceCount":0,"influenced":false},{"link":"/takerealrisks","children":[],"influenceCount":3,"influenced":true},{"link":"/RayLRiv","children":[],"influenceCount":0,"influenced":false},{"link":"/Mister_More","children":[],"influenceCount":0,"influenced":false},{"link":"/WhiteRiceCowboy","children":[],"influenceCount":0,"influenced":false},{"link":"/Draco_XLV","children":[],"influenceCount":0,"influenced":false},{"link":"/Seriousish","children":[],"influenceCount":2,"influenced":true},{"link":"/vic_wms","children":[],"influenceCount":1,"influenced":true},{"link":"/Quarterback_USA","children":[],"influenceCount":0,"influenced":false},{"link":"/JohnyBananaz","children":[],"influenceCount":0,"influenced":false},{"link":"/JamesRoberta7","children":[],"influenceCount":0,"influenced":false},{"link":"/John07508384","children":[],"influenceCount":2,"influenced":true}],"influenceCount":2,"influenced":true},{"link":"/KingBaeksu","children":[],"influenceCount":0,"influenced":false}]}';
+let jsonTree = '';
 let tree = JSON.parse(jsonTree);
 convertTree(0, tree);
 converted.printGraph();
