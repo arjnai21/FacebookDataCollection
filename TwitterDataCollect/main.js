@@ -13,8 +13,8 @@ node.children = array of child nodes
  */
 
 //main function
-const POST = "post: https://twitter.com/Gospel_Truther/status/1094738055733350401";
-const SEARCH_STRS = ["Tom Brady", "witch"];
+const POST = "https://twitter.com/Birdhumms/status/1047540080028602368";
+const SEARCH_STRS = ["scientist", "rosemary", "memory"];
 
 var allNodes = [];
 var dummyNode = {};
@@ -98,7 +98,7 @@ function mainIteration(doc, userNode) { //keyword: string profWindow: window obj
     for (let i = 0; i < tweetsList.length; i++) {
         let tweetText = tweetsList[i].getElementsByClassName("TweetTextSize TweetTextSize--normal js-tweet-text tweet-text")[0].innerText;
         if (checkForKeyWord(SEARCH_STRS, tweetText)) {
-            //console.log(userNode);
+            console.log(userNode);
             setTimeout(ifKeywordFound(userNode, tweetsList, i), 1000);
 
 
