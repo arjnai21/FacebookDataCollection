@@ -20,7 +20,6 @@ if (window.location.href === POST) { // to do if looking at the post
     if (showMoreButton.length > 0)
         showMoreButton[0].click();
 
-
     setTimeout(function () {
         let repliesList = getUserRepliesList(window.document);
         dummyNode.children = repliesListIntoNodes(repliesList, window.document);
