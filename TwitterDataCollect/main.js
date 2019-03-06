@@ -1,9 +1,3 @@
-/* flow -
-get repliers for first post and convert into list of nodes
-for each of those nodes open profile and find influenced tweets
-open influenced tweets and get repliers and search their profile
- */
-// testv
 /*
 Node Object:
 node.link = link to profile
@@ -13,8 +7,8 @@ node.children = array of child nodes
  */
 
 //main function
-const POST = "https://twitter.com/ava/status/1094323068195860480";
-const SEARCH_STRS = ["scientist", "researcher", "HPV", "malignant", "neoplasm"," patient ", "Gallegos", "photodynamic", "therapy"];
+const POST = "https://twitter.com/Suntimes/status/1092789944018452486";
+const SEARCH_STRS = ["blackface", "racist", "mary poppins", "blacking up", "racism"];
 
 var allNodes = [];
 var dummyNode = {};
@@ -32,7 +26,6 @@ if (window.location.href === POST) { // to do if looking at the post
         dummyNode.children = repliesListIntoNodes(repliesList, window.document);
         for (let i = 0; i < dummyNode.children.length; i++) {
             let profWindow = window.open(dummyNode.children[i].link);
-            // profWindow.location.href = dummyNode.children[i].link;
             profWindow.document.body.onload = function () {
                 setTimeout(function () {
 
@@ -53,7 +46,6 @@ function repliesListIntoNodes(repliesList, doc) {
     let nodesList = [];
     let yes = true;
     let val;
-    // if (repliesList.length >= 15) val = 15; // just for cutting it short
     val = repliesList.length;
     for (let i = 0; i < val; i++) {
         if (checkVerified(repliesList[i])) continue; //makes sure no verified accounts are opened, Ex. companies / celebrities
@@ -87,7 +79,7 @@ function checkForKeyWord(keywords, text) { //returns boolean if any term is foun
 
 function mainIteration(doc, userNode) { //keyword: string profWindow: window object userNode: Node object
 
-    // if(counter>=5) return;
+    localStorage.setItem("graph", JSON.stringify(dummyNode));
     if (!checkForKeyWord(SEARCH_STRS, doc.documentElement.innerHTML)) {
 
         return;
@@ -98,7 +90,6 @@ function mainIteration(doc, userNode) { //keyword: string profWindow: window obj
     for (let i = 0; i < tweetsList.length; i++) {
         let tweetText = tweetsList[i].getElementsByClassName("TweetTextSize TweetTextSize--normal js-tweet-text tweet-text")[0].innerText;
         if (checkForKeyWord(SEARCH_STRS, tweetText)) {
-            //console.log(userNode);
             setTimeout(ifKeywordFound(userNode, tweetsList, i), 1000);
 
 
@@ -106,10 +97,6 @@ function mainIteration(doc, userNode) { //keyword: string profWindow: window obj
 
     }
 
-
-    //   profWindow.close();
-
-        localStorage.setItem("graph", JSON.stringify(dummyNode));
 
 }
 
@@ -121,7 +108,6 @@ function getLinkFromTweet(tweet) { //tweet is an <li> html object
 //working
 function getUserRepliesList(doc) { // tweetWindow is a window object
     let userList = doc.getElementsByClassName("account-group js-user-profile-link");
-    //account-group js-account-group js-action-profile js-user-profile-link js-nav
     let repliesList = [];
 
     for (let i = 1; i < userList.length; i++) {
@@ -142,15 +128,6 @@ function ifKeywordFound(userNode, tweetsList, i) {
     userNode.influenceCount++;
     let link = getLinkFromTweet(tweetsList[i]); //get link with tweetlist[i]
     if (POST.includes(link)) return;
-
-    /*for (let i = 0; i < links.length; i++) {
-        if (!links[i].href.includes("hashtag")) {
-            link = links[i].href;
-            break;
-        }
-    }*/
-
-
     let postWindow = window.open(link);
 
     postWindow.document.body.onload = function () {
@@ -180,34 +157,3 @@ function ifKeywordFound(userNode, tweetsList, i) {
         }, 100);
     };
 }
-
-
-/*function openNewTab(user){
-    //text = new XMLSerializer().serializeToString(document);
-    var link = "https://twitter.com" + user.getAttribute("href");
-    //open new tab with that link, search entire dom with innerHTML
-    var req = {};
-    req.message = "open_new_tab";
-    req.url = link;
-    var pause = false;
-    chrome.runtime.sendMessage(req);
-    //makes code wait until message is received
-    /*while (true){
-        if (pause){
-            break;
-        }
-    }*/
-//var text = document.documentElement.innerHTML;
-
-
-/*
-function iterateUsersList() {
-    let userList = getUserRepliesList();
-    let userHitDict = {};
-    for (let i = 0; i < userList.length; i++) {
-        openNewTab(userList[i]);
-        userHitDict[userList[i]] = hits;
-    }
-    return userHitDict;
-}
-*/
