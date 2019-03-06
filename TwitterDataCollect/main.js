@@ -98,6 +98,10 @@ function mainIteration(doc, userNode) { //keyword: string profWindow: window obj
     }
 
 
+    //   profWindow.close();
+
+        localStorage.setItem("graph", JSON.stringify(dummyNode));
+
 }
 
 function getLinkFromTweet(tweet) { //tweet is an <li> html object
